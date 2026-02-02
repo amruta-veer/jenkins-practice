@@ -5,20 +5,27 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out code...'
+                checkout scm
             }
         }
 
         stage('Install') {
             steps {
                 echo 'Installing dependencies...'
-                bat 'pip install pandas numpy'
+                // Create virtual environment using full Python path
+                bat 'C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python310\\python.exe -m venv venv'
+                
+                // Use pip from the virtual environment
+                bat 'venv\\Scripts\\pip.exe install --upgrade pip'
+                bat 'venv\\Scripts\\pip.exe install pandas numpy'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                bat 'python -c "import pandas; print(pandas.__version__)"'
+                // Use python from the virtual environment
+                bat 'venv\\Scripts\\python.exe -c "import pandas; print(pandas.__version__)"'
             }
         }
 
