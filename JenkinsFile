@@ -1,25 +1,28 @@
 pipeline {
-    agent any                          // Run on any available agent
+    agent any
 
     stages {
-        stage('Checkout') {            // Stage 1: Get the code
+        stage('Checkout') {
             steps {
                 echo 'Checking out code...'
             }
         }
-        stage('Install') {             // Stage 2: Install dependencies
+
+        stage('Install') {
             steps {
                 echo 'Installing dependencies...'
-                sh 'pip install pandas numpy'   // Shell command
+                bat 'pip install pandas numpy'
             }
         }
-        stage('Test') {                // Stage 3: Run tests
+
+        stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'python -c "import pandas; print(pandas.__version__)"'
+                bat 'python -c "import pandas; print(pandas.__version__)"'
             }
         }
-        stage('Deploy') {              // Stage 4: Deploy
+
+        stage('Deploy') {
             steps {
                 echo 'Deploying...'
                 echo 'Pipeline complete!'
