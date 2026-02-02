@@ -2,30 +2,37 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
                 echo 'Checking out code...'
                 checkout scm
             }
         }
 
-        stage('Install') {
+        stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
-                // Create virtual environment using full Python path
-                bat 'C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python310\\python.exe -m venv venv'
-                
-                // Use pip from the virtual environment
-                bat 'venv\\Scripts\\pip.exe install --upgrade pip'
-                bat 'venv\\Scripts\\pip.exe install pandas numpy'
+                echo 'Setting up Python virtual environment and installing packages...'
+                script {
+                    // Create virtual environment
+                    def pythonPath = 'C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python310\\python.exe'
+                    bat "${pythonPath} -m venv venv"
+
+                    // Upgrade pip using python -m pip (Windows safe)
+                    bat 'venv\\Scripts\\python.exe -m pip install --upgrade pip'
+
+                    // Install required packages
+                    bat 'venv\\Scripts\\python.exe -m pip install pandas numpy'
+                }
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                // Use python from the virtual environment
-                bat 'venv\\Scripts\\python.exe -c "import pandas; print(pandas.__version__)"'
+                script {
+                    // Run a simple test using virtual environment Python
+                    bat 'venv\\Scripts\\python.exe -c "import pandas as pd; import numpy as np; print(\'Pandas version:\', pd.__version__, \'NumPy version:\', np.__version__)"'
+                }
             }
         }
 
@@ -34,6 +41,15 @@ pipeline {
                 echo 'Deploying...'
                 echo 'Pipeline complete!'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline finished successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs for details.'
         }
     }
 }
